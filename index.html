@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>E-GB</title>
+</head>
+
+<body>
+    <h1>Hello!</h1>
+    <ul id="list"></ul>
+    <input type="text" id="txtname">
+    <button id="btnadd">add</button>
+    <button id="btnclear">clear</button>
+    <script type="text/javascript">
+    const db = require('electron').remote.require('./main-process/db.js');
+    const list = document.getElementById('list');
+    const txtname = document.getElementById('txtname');
+    const renderEntry = function(entry) {
+        let li = document.getElementById(entry._id);
+        if (!li) {
+            li = document.createElement('li')
+
+            const btndel = document.createElement('button');
+            btndel.innerHTML = 'del';
+            btndel.onclick = () => {
+                db.remove(entry).then(() => list.removeChild(li));
+            };
+
+            const btnupd = document.createElement('button');
+            btnupd.innerHTML = 'upd';
+            btnupd.onclick = () => {
+                db.save(entry)
+                    .then(([, entry]) => renderEntry(entry))
+                    .catch(err => console.error(err));
+            };
+
+            li.id = entry._id;
+            li.appendChild(btndel);
+            li.appendChild(btnupd);
+            list.appendChild(li);
+        } else {
+            li.removeChild(li.lastChild);
+        }
+
+        li.appendChild(document.createTextNode(JSON.stringify(entry)));
+    }
+
+    db.find().then(entries => {
+        entries.forEach(renderEntry);
+    }).catch(err => {
+        console.error(err);
+    });
+
+    document.getElementById('btnadd').onclick = function() {
+        db.save({
+            "name": txtname.value,
+            "category": "test",
+            "content": `contenuto per la voce ${txtname.value}`,
+            "tags": ['animali']
+        }).then(([, entry, isnew]) => {
+            console.log('*** save', entry, isnew);
+            renderEntry(entry);
+        }).catch(err => {
+            console.error(err);
+        });
+    };
+    document.getElementById('btnclear').onclick = function() {
+        db.clear().then(count => {
+            console.log('removed', count, 'entries');
+            list.innerHTML = '';
+        }).catch(err => {
+            console.error(err);
+        });
+    };
+    </script>
+</body>
+
+</html>

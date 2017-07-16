@@ -1,0 +1,39 @@
+{
+  "name": "egb",
+  "version": "1.0.0",
+  "description": "private encyclopedia",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "mocha test",
+    "dev": "electron . --debug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/narsenico/egb.git"
+  },
+  "keywords": [
+    "encyclopedia",
+    "electron"
+  ],
+  "author": "narsenico",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/narsenico/egb/issues"
+  },
+  "homepage": "https://github.com/narsenico/egb#readme",
+  "devDependencies": {
+    "chai": "^4.1.0",
+    "chai-as-promised": "^7.1.1",
+    "devtron": "^1.4.0",
+    "electron": "^1.7.4",
+    "mocha": "^3.4.2",
+    "spectron": "^3.7.2"
+  },
+  "dependencies": {
+    "es6-promisify": "^5.0.0",
+    "glob": "^7.1.2",
+    "lodash": "^4.17.4",
+    "nedb": "^1.8.0"
+  }
+}
