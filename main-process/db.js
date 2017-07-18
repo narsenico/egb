@@ -3,13 +3,14 @@
  * I dati sono persistenti e salvati nel file ~/Library/Application\ Support/egb/egbdata.db.
  * 
  * Le voci sono rappresentate dall'oggetto "entry" così definito
- * { name: String, 
- *  category: String, 
- *  lastUpdate: Date, 
- *  content: String, 
- *  ref: String,
- *  attachments: [String], 
- *  tags: [String] }
+ * - name: String, nome univoco, calcolato a partire dal titolo
+ * - category: String, categoria
+ * - lastUpdate: Date, data ultimo aggiornamento
+ * - caption: String, titolo
+ * - content: String, contenuto formattato
+ * - ref: String, riferimenti all'entry
+ * - attachments: [String], allegati
+ * - tags: [String]. elenco di tag
  * 
  * @see https://github.com/louischatriot/nedb
  */
@@ -22,17 +23,16 @@ const app = require('electron').app,
     db = new Datastore({ filename: path.join(app.getPath('userData'), 'egbdata.db'), autoload: true });
 
 // constraint sui dati
-// TODO: serve davvero un indice su name? si può usare _id (che contiene il name "normalizzato") per ordinare
-//  tanto la ricerca verrà sempre fatta su più campi (name, tags, category)
 db.ensureIndex({ "fieldName": "name", "unique": true });
 
 // modello per una entry, per ogni campo è specificato il tipo, 
 //  se è richiesto e se può essere vuoto (solo stringhe)
 const EntryModel = {
-    "_id": { "type": String, "required": true, "empty": false },
+    "_id": { "type": String, "required": false },
     "name": { "type": String, "required": true, "empty": false },
-    "category": { "type": String, "required": true },
+    "category": { "type": String, "required": false },
     "lastUpdate": { "type": Date, "required": false },
+    "caption": { "type": String, "required": true, "empty": false },
     "content": { "type": String, "required": false },
     "ref": { "type": String, "required": false },
     "attachments": { "type": Array, "required": false },
@@ -41,42 +41,24 @@ const EntryModel = {
 // campi del documento "entry"
 const entryFields = Object.keys(EntryModel);
 
-/**
- * Ritorna _id partendo dal nome.
- *
- * @param      {string}  name    la proprietà name di entry
- * @return     {string}  _id
- */
-const idByName = function(name) {
-    
-// TODO: rimuovere tutti i doppi spazi
-
-    return name.trim().toUpperCase();
+const removeSpaces = function(text) {
+    return text.trim().replace(/\s{2,}/g, ' ');
+}
+const cleanName = function(name) {
+    return removeSpaces(name).toUpperCase();
 };
 /**
+ * Imposto la chiave "name" e aggiorna la data di ultima modifica.
  * 
- * Imposta _id come l'uppercase trimmato del nome, aggiorna la data di ultima modifica.
- *
  * @param      {Object}  entry   l'istanza di entry da normalizzare
  * @return     {Object}  entry   una copia di entry con i soli campi previsti dal modello EntryModel
  */
 const normalizeEntry = function(entry) {
-    if (entry.name) {
-        entry.name = entry.name.toString();
-        entry._id = idByName(entry.name);
+    if (entry.caption) {
+        entry.name = cleanName(entry.caption);
     }
     entry.lastUpdate = new Date();
     return _.pick(entry, entryFields);
-};
-/**
- * Elabora la stringa "query" e crea un oggetto da passare come filtro a db.find()
- *
- * @param      {String}  query   una stringa contenente i termini della ricerca
- * @return     {Object}  un oggetto da passare a db.find()
- */
-const parseQuery = function(query) {
-    // TODO
-    return {};
 };
 /**
  * Valida un entry.
@@ -142,15 +124,17 @@ module.exports = {
                 return Promise.reject(error);
             }
         }
+        // se l'entry possiede un _id lo uso, perché nel frattempo potrebbe aver cambiato nome
+        const query = (entry._id ? { "_id": entry._id } : { "name": entry.name });
         // aggiorno, sostituendolo, l'entry con lo stesso nome, altrimenti inserisco se non esiste
         if (cb) {
-            db.update({ "_id": entry._id },
+            db.update(query,
                 entry,
                 // se non esiste esegue un inserimento
                 { "upsert": true, "returnUpdatedDocs": true },
                 cb);
         } else {
-            return _update({ "_id": entry._id },
+            return _update(query,
                 entry,
                 // se non esiste esegue un inserimento
                 { "upsert": true, "returnUpdatedDocs": true });
@@ -164,11 +148,11 @@ module.exports = {
      * @return     {Object}    promise
      */
     "remove": function(entry, cb) {
-        const _id = idByName(entry && entry.name ? entry.name : entry);
+        const name = entry && entry.name ? entry.name : cleanName(entry);
         if (cb) {
-            db.remove({ "_id": _id }, {}, cb);
+            db.remove({ "name": name }, {}, cb);
         } else {
-            return _remove({ "_id": _id }, {});
+            return _remove({ "name": name }, {});
         }
     },
     /**
@@ -186,7 +170,6 @@ module.exports = {
     },
     /**
      * Cerca l'entry con un dato nome, ignora maiuscole/minuscole.
-     * La ricerca in realtà verrà effettuata sul campo _id.
      *
      * @param      {String}    name    il nome da cercare
      * @param      {Function}  cb      {err, doc}
@@ -194,9 +177,9 @@ module.exports = {
      */
     "findByName": function(name, cb) {
         if (cb) {
-            db.findOne({ "_id": idByName(name) }).exec(cb);
+            db.findOne({ "name": cleanName(name) }).exec(cb);
         } else {
-            return _findOne({ "_id": idByName(name) });
+            return _findOne({ "name": cleanName(name) });
         }
     },
     /**

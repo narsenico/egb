@@ -57,18 +57,18 @@ describe('egb test: db', function() {
     it('save entry "ipad"', function() {
         return app.client.executeAsync(function(done) {
             return adb.save({
-                "name": " ipad ",
+                "caption": "ipad",
                 "category": "tablet",
                 "content": "is a tablet"
             }).then(done, done);
         }).then(function(result) {
             result.value.should.be.a('array');
             result.value[0].should.be.equal(1);
-            result.value[1].should.to.have.property('_id', 'IPAD');
+            result.value[1].should.to.have.property('name', 'IPAD');
         });
     });
 
-    it('remove entry "ipad" by name', function() {
+    it('remove entry "ipad" by caption', function() {
         return app.client.executeAsync(function(done) {
             return adb.remove('iPad').then(done, done);
         }).then(function(result) {
@@ -84,43 +84,78 @@ describe('egb test: db', function() {
         }).should.eventually.be.a('number').to.equal(0);
     });
 
-    it('try to save entry with empty name', function() {
+    it('use caption with spaces', function() {
         return app.client.executeAsync(function(done) {
             return adb.save({
-                "name": " "
+                "caption": " homo sapiens  sapiens "
+            }).then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array');
+            result.value[0].should.be.equal(1);
+            result.value[1].should.to.have.property('name', 'HOMO SAPIENS SAPIENS');
+        });
+    });
+
+    it('try to save entry with empty caption', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.save({
+                "caption": " "
             }).then(done, done);
         }).then(function(result) {
             result.value.should.be.a('object').to.have.property('name', 'Error');
         });
     });
 
-    it('try to save entry with "null" name', function() {
+    it('try to save entry with "null" caption', function() {
         return app.client.executeAsync(function(done) {
             return adb.save({
-                "name": null
+                "caption": null
             }).then(done, done);
         }).then(function(result) {
             result.value.should.be.a('object').to.have.property('name', 'Error');
         });
     });
 
-    it('try to save entry with "undefined" name', function() {
+    it('try to save entry with "undefined" caption', function() {
         return app.client.executeAsync(function(done) {
             return adb.save({
-                "name": undefined
+                "caption": undefined
             }).then(done, done);
         }).then(function(result) {
             result.value.should.be.a('object').to.have.property('name', 'Error');
         });
     });
 
-    it('try to save entry without name', function() {
+    it('try to save entry without caption', function() {
         return app.client.executeAsync(function(done) {
             return adb.save({
                 "category": "tablet"
             }).then(done, done);
         }).then(function(result) {
             result.value.should.be.a('object').to.have.property('name', 'Error');
+        });
+    });
+
+    it('change entry caption', async function() {
+        return app.client.executeAsync(function(done) {
+            const changeCaption = async function() {
+                const entry = await adb.findByName('homo sapiens sapiens');
+                entry.caption = 'homo herectus';
+                const [, newEntry] = await adb.save(entry);
+                if (entry._id === newEntry._id) return newEntry;
+                else throw `not equals id ${entry._id} === ${newEntry._id}`;
+            };
+            return changeCaption().then(done, done);
+        }).then(function(result) {
+            result.value.should.to.have.property('name', 'HOMO HERECTUS');
+        });
+    });
+
+    it('entry with old caption no longer exists', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.findByName('homo sapiens sapiens').then(done, done);
+        }).then(function(result) {
+            result.should.have.property('value').to.be.null;
         });
     });
 
@@ -136,7 +171,7 @@ describe('egb test: db', function() {
         return app.client.executeAsync(function(done) {
             return adb.findByName('Jacquelynn Bongiorno').then(done, done);
         }).then(function(result) {
-            result.value.should.be.a('object').to.have.property('_id', 'JACQUELYNN BONGIORNO');
+            result.value.should.be.a('object').to.have.property('name', 'JACQUELYNN BONGIORNO');
         });
     })
 
@@ -145,7 +180,7 @@ describe('egb test: db', function() {
             return adb.search('brock').then(done, done);
         }).then(function(result) {
             result.value.should.be.a('array').to.have.lengthOf(2);
-        });        
+        });
     })
 
     // TODO: testare UTF-8
