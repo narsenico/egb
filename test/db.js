@@ -173,7 +173,7 @@ describe('egb test: db', function() {
         }).then(function(result) {
             result.value.should.be.a('object').to.have.property('name', 'JACQUELYNN BONGIORNO');
         });
-    })
+    });
 
     it('search "brock"', function() {
         return app.client.executeAsync(function(done) {
@@ -181,7 +181,110 @@ describe('egb test: db', function() {
         }).then(function(result) {
             result.value.should.be.a('array').to.have.lengthOf(2);
         });
-    })
+    });
 
-    // TODO: testare UTF-8
+    it('search "Daniella Dicks"', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('daniella dicks').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(2);
+        });
+    });
+
+    it('search "Adélaïde"', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('ADÉLAÏDE').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    // it('search "Adélaïde" without accents', function() {
+    //     return app.client.executeAsync(function(done) {
+    //         return adb.search('adelaide').then(done, done);
+    //     }).then(function(result) {
+    //         result.value.should.be.a('array').to.have.lengthOf(1);
+    //     });
+    // });
+
+    it('search words with accents', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('èòàù').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search words with single quote', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('po\'').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search words with double quote', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('\"èòàù\"').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search words with special chars', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('100%').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search words with curly brackets', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('{\"a\": ').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search words with kanji', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('士郎').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search words with hiragana', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('しろう').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search category "code"', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('code').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    it('search tag "fake"', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('fake').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf.above(1);
+        });
+    });
+
+    it('find by category', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.findByCategory(' Code').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
 });

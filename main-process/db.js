@@ -10,7 +10,7 @@
  * - content: String, contenuto formattato
  * - ref: String, riferimenti all'entry
  * - attachments: [String], allegati
- * - tags: [String]. elenco di tag
+ * - tags: String, elenco di tag
  * 
  * @see https://github.com/louischatriot/nedb
  */
@@ -36,7 +36,7 @@ const EntryModel = {
     "content": { "type": String, "required": false },
     "ref": { "type": String, "required": false },
     "attachments": { "type": Array, "required": false },
-    "tags": { "type": Array, "required": false }
+    "tags": { "type": String, "required": false }
 };
 // campi del documento "entry"
 const entryFields = Object.keys(EntryModel);
@@ -48,7 +48,10 @@ const cleanName = function(name) {
     return removeSpaces(name).toUpperCase();
 };
 /**
- * Imposto la chiave "name" e aggiorna la data di ultima modifica.
+ * Normalizza l'entry:
+ * - aggiorna la data di ultima modifica
+ * - crea name in base a caption
+ * - rimuove gli spazi superflui a category
  * 
  * @param      {Object}  entry   l'istanza di entry da normalizzare
  * @return     {Object}  entry   una copia di entry con i soli campi previsti dal modello EntryModel
@@ -56,6 +59,9 @@ const cleanName = function(name) {
 const normalizeEntry = function(entry) {
     if (entry.caption) {
         entry.name = cleanName(entry.caption);
+    }
+    if (entry.category) {
+        entry.category = removeSpaces(entry.category);
     }
     entry.lastUpdate = new Date();
     return _.pick(entry, entryFields);
@@ -190,21 +196,29 @@ module.exports = {
      * @return     {Object}    promise
      */
     "findByCategory": function(category, cb) {
-        const reCategory = new RegExp(`^\s*${category}\s*$`, 'i');
+        const reCategory = new RegExp(`^\s*${removeSpaces(category)}\s*$`, 'i');
         if (cb) {
             db.find({ "category": { "$regex": reCategory } }).exec(cb);
         } else {
             return _find({ "category": { "$regex": reCategory } });
         }
     },
+    /**
+     * Estrae entry che soddifano la query di ricerca.
+     *
+     * @param      {String}    query   La query di ricerca: serie di parole da ricercare nelle proprietà di entry
+     * @param      {Function}  cb      {err, [{index, matches, totalWeight}]}
+     * @return     {Object}    promise
+     */
     "search": function(query, cb) {
+        const searchFor = ['name', 'category', 'tags'];
         if (cb) {
             db.find({}, (err, docs) => {
                 if (err) return cb(err);
-                else return cb(null, searchEngine.byWeight(docs, query));
+                else return cb(null, searchEngine.byWeight(docs, query, searchFor));
             });
         } else {
-            return _find({}).then(docs => searchEngine.byWeight(docs, query));
+            return _find({}).then(docs => searchEngine.byWeight(docs, query, searchFor));
         }
     },
     /**
