@@ -34,7 +34,7 @@ describe('egb test: db', function() {
             return app.client.waitUntilWindowLoaded().then(() => {
                 app.client.execute(function() {
                     adb = require('electron').remote.require('./main-process/db');
-                    fakeEntries = require('./test/fakeentries.json');
+                    fakeEntries = require('../test/fakeentries.json');
                 })
             });
         });
@@ -284,6 +284,27 @@ describe('egb test: db', function() {
             return adb.findByCategory(' Code').then(done, done);
         }).then(function(result) {
             result.value.should.be.a('array').to.have.lengthOf(1);
+        });
+    });
+
+    // TOOD: questi due danno risultati falsamente positivi, visto che sia le categorie che i tags
+    //  vengono letti al primo caricamento del DB e mai aggiornate
+    //  quindi la prima volta che si esegue il test, a DB vuoto, risulteranno vuote anch'esse (quindi errore)
+    //  mentre le volte successive, con i dati caricati (da fakeentries) andrà tutto bene
+
+    it('get categories', function() {
+        return app.client.executeAsync(function(done) {
+            done(adb.categories);
+        }).then(function(result) {
+            result.value.should.be.a('object').to.have.property('code');
+        });
+    });
+
+    it('get tags', function() {
+        return app.client.executeAsync(function(done) {
+            done(adb.tags);
+        }).then(function(result) {
+            result.value.should.be.a('object').to.have.property('fake name');
         });
     });
 

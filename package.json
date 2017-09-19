@@ -23,11 +23,11 @@
   },
   "homepage": "https://github.com/narsenico/egb#readme",
   "devDependencies": {
-    "chai": "^4.1.0",
+    "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "devtron": "^1.4.0",
-    "electron": "^1.7.4",
-    "mocha": "^3.4.2",
+    "electron": "^1.8.0",
+    "mocha": "^3.5.3",
     "spectron": "^3.7.2"
   },
   "dependencies": {
