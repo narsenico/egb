@@ -2,15 +2,43 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
-	<span data-trx>hello</span>
-	<script type="text/javascript">
-		const {applyToDom: apply} = require('../main-process/translate.js');
-		apply(document);
-	</script>
+    <div class="window">
+        <header class="toolbar toolbar-header">
+            <h1 class="title">App Name</h1>
+            <div class="toolbar-actions">
+                <div class="btn-group">
+                    <button class="btn btn-default">
+                        <span class="icon icon-home"></span>
+                    </button>
+                    <button class="btn btn-default">
+                        <span class="icon icon-folder"></span>
+                    </button>
+                </div>
+                <div class="form-group pull-right search-wrap icon icon-search">
+                    <input class="form-control trx-placeholder" type="search" placeholder="Search">
+                </div>
+            </div>
+        </header>
+        <div class="window-content">
+            <div class="padded-more">
+                <h1>EGB... your personal encyclopedia</h1>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    // TODO: spostare in js esterno
+    const { remote } = require('electron');
+    const { applyToDom } = require('../main-process/translate');
+    document.querySelector('.toolbar-header>.title').innerHTML = remote.app.getName();
+    applyToDom();
+    </script>
 </body>
 
 </html>

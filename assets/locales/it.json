@@ -1,3 +1,19 @@
 {
-	"hello": "ciao"
+	"New": "Nuovo",
+	"Edit": "Modifica",
+	"View": "Visualizza",
+	"Close": "Chiudi",
+	"Minimize": "Riduci a icon",
+	"Bring All to Front": "Porta tutto in primo piano",
+	"Reload": "Ricarica",
+	"Cut": "Taglia",
+	"Copy": "Copia",
+	"Paste": "Incolla",
+	"Paste and Match Style": "Incolla e mantieni lo stile",
+	"Delete": "Elimina",
+	"Select All": "Seleziona tutto",
+	"Speech": "Voce",
+	"Start Speaking": "Avvia comandi vocali",
+	"Stop Speaking": "Interrompi comandi vocali",
+	"Search": "Ricerca"
 }

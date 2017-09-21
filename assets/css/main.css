@@ -1,0 +1,42 @@
+@import '../../node_modules/photonkit/dist/css/photon.css';
+
+.toolbar-header>.title {
+    /* rende la barra del titolo draggabile in modo da poter spostare la finestra */
+    -webkit-app-region: drag;
+}
+
+.toolbar-actions>.form-group {
+    display: inline-block;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-bottom: 0px;
+}
+
+.toolbar-actions>.form-group>input[type="search"] {
+    padding: 0 4px;
+    border: solid 1px #b9b2b2;
+    text-align: center;
+}
+
+.toolbar-actions>.form-group>input[type="search"]:focus {
+    text-align: left;
+}
+
+.toolbar-actions>.form-group>input[type="search"]::-webkit-input-placeholder {
+    color: #989698;
+}
+
+.toolbar-actions>.form-group.search-wrap.icon {
+	position: relative;
+    color: #737475;
+}
+
+.toolbar-actions>.form-group.search-wrap.icon:before {
+    position: absolute;
+    top: .45em;
+    left: .4em;
+}
+
+.toolbar-actions>.form-group.search-wrap.icon>input[type="search"] {
+	padding-left: 18px;
+}

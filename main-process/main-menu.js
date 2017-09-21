@@ -17,20 +17,20 @@
  * @see https://github.com/electron/electron/blob/master/docs/api/menu-item.md#roles
  */
 const { app, Menu } = require('electron'),
-    EventEmitter = require('events');
+    EventEmitter = require('events'), { translate: T } = require('./translate.js');
 
 function getTemplate(eventEmitter) {
     return [{
-            label: 'File',
+            label: T('File'),
             submenu: [{
-                label: 'New',
+                label: T('New'),
                 click(menuItem, browserWindow, event) {
                     eventEmitter.emit('new-file')
                 }
             }]
         },
         {
-            label: 'Edit',
+            label: T('Edit'),
             submenu: [{
                     role: 'undo'
                 },
@@ -41,27 +41,33 @@ function getTemplate(eventEmitter) {
                     type: 'separator'
                 },
                 {
+                    label: T('Cut'),
                     role: 'cut'
                 },
                 {
+                    label: T('Copy'),
                     role: 'copy'
                 },
                 {
+                    label: T('Paste'),
                     role: 'paste'
                 },
                 {
+                    label: T('Paste and Match Style'),
                     role: 'pasteandmatchstyle'
                 },
                 {
+                    label: T('Delete'),
                     role: 'delete'
                 },
                 {
+                    label: T('Select All'),
                     role: 'selectall'
                 }
             ]
         },
         {
-            label: 'View',
+            label: T('View'),
             submenu: [{
                     role: 'resetzoom'
                 },
@@ -97,6 +103,7 @@ function createMacOsMenu(template, eventEmitter) {
     template.unshift({
         label: name,
         submenu: [{
+                label: T('About %1', name),
                 role: 'about'
             },
             {
@@ -130,35 +137,37 @@ function createMacOsMenu(template, eventEmitter) {
     template[2].submenu.push({
         type: 'separator'
     }, {
-        label: 'Speech',
+        label: T('Speech'),
         submenu: [{
+                label: T('Start Speaking'),
                 role: 'startspeaking'
             },
             {
+                label: T('Stop Speaking'),
                 role: 'stopspeaking'
             }
         ]
     })
     // Window menu.
     template[4].submenu = [{
-            label: 'Close',
+            label: T('Close'),
             accelerator: 'CmdOrCtrl+W',
             role: 'close'
         },
         {
-            label: 'Minimize',
+            label: T('Minimize'),
             accelerator: 'CmdOrCtrl+M',
             role: 'minimize'
         },
         {
-            label: 'Zoom',
+            label: T('Zoom'),
             role: 'zoom'
         },
         {
             type: 'separator'
         },
         {
-            label: 'Bring All to Front',
+            label: T('Bring All to Front'),
             role: 'front'
         }
     ]
@@ -166,16 +175,16 @@ function createMacOsMenu(template, eventEmitter) {
 
 function createDebugMenu(template, eventEmitter) {
     template.push({
-        label: 'Debug',
+        label: T('Debug'),
         submenu: [{
-                label: 'Reload',
+                label: T('Reload'),
                 accelerator: 'CmdOrCtrl+R',
                 click(menuItem, browserWindow, event) {
                     if (browserWindow) browserWindow.reload()
                 }
             },
             {
-                label: 'Toggle Developer Tools',
+                label: T('Toggle Developer Tools'),
                 accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
                 click(menuItem, browserWindow, event) {
                     if (browserWindow) browserWindow.webContents.toggleDevTools()

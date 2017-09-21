@@ -16,6 +16,9 @@ function createWindow() {
         width: 800,
         minWidth: 680,
         height: 600,
+        acceptFirstMouse: true,
+        // sono comunque presenti i pulsant di controllo della finestra (semaforo)
+        titleBarStyle: 'hidden',
         title: app.getName()
     });
     win.loadURL(path.join('file://', __dirname, '..', '/assets/index.html'));

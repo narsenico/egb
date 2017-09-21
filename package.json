@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron .",
     "test": "mocha test",
-    "dev": "electron . --debug"
+    "dev": "electron . --debug",
+    "build": "electron-packager . --ignore=\".*sublime.*\" --ignore=\"build\\.sh\" --overwrite"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,12 @@
     "es6-promisify": "^5.0.0",
     "glob": "^7.1.2",
     "lodash": "^4.17.4",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "photonkit": "^0.1.2"
+  },
+  "standard": {
+    "env": {
+      "mocha": true
+    }
   }
 }

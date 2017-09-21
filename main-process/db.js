@@ -18,7 +18,7 @@ const app = require('electron').app,
     path = require('path'),
     promisify = require('es6-promisify'),
     _ = require('lodash'),
-    searchEngine = require('../assets/search-engine.js'),
+    searchEngine = require('../assets/js/search-engine.js'),
     Datastore = require('nedb'),
     db = new Datastore({ filename: path.join(app.getPath('userData'), 'egbdata.db'), autoload: true }),
     // TODO: aggionrnare i dati della cache in tempo reale (in save, remove, etc.)
@@ -315,6 +315,11 @@ const controller = {
 
 // definisco alcune proprietà in sola lettura
 Object.defineProperties(controller, {
+    location: {
+        get: function() {
+            return db.filename;
+        }
+    },
     categories: {
         get: function() {
             return cache.categories;
