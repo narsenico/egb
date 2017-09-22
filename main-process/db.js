@@ -270,14 +270,15 @@ function findByCategory(category, cb) {
  * @return     {Object}    promise
  */
 function search(query, cb) {
-    const searchFor = ['name', 'category', 'tags'];
+    // TODO: cercare anche in content
+    const searchFor = ['name', 'category', 'tags', 'content'];
     if (cb) {
         db.find({}, (err, docs) => {
             if (err) return cb(err);
-            else return cb(null, searchEngine.byWeight(docs, query, searchFor));
+            else return cb(null, searchEngine.byWeightBound(docs, query, searchFor));
         });
     } else {
-        return _find({}).then(docs => searchEngine.byWeight(docs, query, searchFor));
+        return _find({}).then(docs => searchEngine.byWeightBound(docs, query, searchFor));
     }
 }
 

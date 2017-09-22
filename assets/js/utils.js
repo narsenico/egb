@@ -1,3 +1,5 @@
+const rgEmptyString = /^\s*$/;
+
 /**
  * In base al tipo di selector ritorna:
  * - Element: un array che ha come unico elemento selector
@@ -27,6 +29,12 @@ function parseSelector(selector) {
     }
 }
 
+function isEmpty(text) {
+    return text === null || text === undefined || 
+        rgEmptyString.test(text);
+}
+
 module.exports = {
-    parseSelector
+    parseSelector,
+    isEmpty
 }

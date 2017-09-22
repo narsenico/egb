@@ -17,7 +17,7 @@
  * @see https://github.com/electron/electron/blob/master/docs/api/menu-item.md#roles
  */
 const { app, Menu } = require('electron'),
-    EventEmitter = require('events'), { translate: T } = require('./translate.js');
+    EventEmitter = require('events'), { translate: T } = require('../assets/js/translate.js');
 
 function getTemplate(eventEmitter) {
     return [{

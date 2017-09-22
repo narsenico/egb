@@ -279,6 +279,14 @@ describe('egb test: db', function() {
         });
     });
 
+    it('search tag "fake" bis', function() {
+        return app.client.executeAsync(function(done) {
+            return adb.search('fake').then(done, done);
+        }).then(function(result) {
+            result.value.should.be.a('array').to.have.lengthOf.above(1);
+        });
+    });
+
     it('find by category', function() {
         return app.client.executeAsync(function(done) {
             return adb.findByCategory(' Code').then(done, done);
